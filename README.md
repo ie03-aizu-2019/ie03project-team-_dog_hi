@@ -11,7 +11,7 @@ Noritaka Kagei (s1250048)
 
 Template Operation for git upload
 
-Step01. git add <your-file>
+Step01. git add (your-file).***
 
 Step02. git commit -m "your-comment"
 
