@@ -1,10 +1,12 @@
 public class phase1_2 extends phase1_1 {
     protected static Point temp;
     protected static double differenceX;
+    protected static Point[] point;
     
+    //main method
     public static void main(String[] argv){
 	input();
-	Point[] point = new Point[(M*M-M)/2];
+	point = new Point[(M*M-M)/2];
 	search_intersection02(point);
 	sort(point);
 	output(point);
