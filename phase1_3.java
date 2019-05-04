@@ -7,14 +7,85 @@ public class phase1_3 extends phase1_2 {
     protected static int[] point3Intersection;
     protected static int[] point4Intersection;
     protected static int[] elementIntersection;
+    protected static int WHITE = 0;
+    protected static int GRAY = 1;
+    protected static int BLACK = 2;
     public static void main(String[] argv){
         input();
         searchIntersection02();
         initializeMinimumSpanningTree_Matrix();
-        matrixOutput();
+        //matrixOutput();
+        rundijkstraAlgorithm();
     }
 
     //methods
+    public static void dijkstraAlgorithm(int start, int end, int loop){
+        double[] d = new double[N+countIntersection];
+        int[] color = new int[N+countIntersection];
+        double minv;
+
+        if(start>N+countIntersection || end>N+countIntersection){
+            for(int i=0;i<loop;i++){
+                System.out.println("NA");
+            }
+        } else { // the element is in normal range
+            //initialize
+            start -= 1;
+            end -= 1;
+            for(int i=0;i < N+countIntersection;i++){
+                d[i] = INFINITY;
+                color[i] = WHITE;
+            }
+
+            d[start] = 0;
+            color[start] = GRAY;
+            while(true){
+                minv = INFINITY;
+                int u = -1;
+                for(int i=0; i < N+countIntersection; i++){
+                    if(minv > d[i] && color[i] != BLACK){
+                        u = i;
+                        minv = d[i];
+                    }
+                }
+                if(u == -1){
+                    break;
+                }
+                color[u] = BLACK;
+                for(int v=0; v < N+countIntersection; v++){
+                    if(color[v] != BLACK && Matrix[u][v] != INFINITY){
+                        if(d[v] > d[u]+Matrix[u][v]){
+                            d[v] = d[u] + Matrix[u][v];
+                            color[v] = GRAY;
+                        }
+                    }
+                }
+            }// end of while loop
+
+            //output answer
+            System.out.println(String.format("%.5f", d[end]));
+        }
+    }// end of dijkstraAlgorithm method
+    public static void rundijkstraAlgorithm(){
+        int start_num,end_num;
+        for(int i=0; i<Q; i++){
+            start_num=0;
+            end_num=0;
+            if(start[i].charAt(0) == 'C'){
+                start_num = N + Integer.valueOf(start[i].substring(1));
+            } else {
+                start_num = Integer.valueOf(start[i]);
+            }
+            if(end[i].charAt(0) == 'C'){
+                end_num = N + Integer.valueOf(end[i].substring(1));
+            } else {
+                end_num = Integer.valueOf(end[i]);
+            }
+
+            dijkstraAlgorithm(start_num, end_num, k[i]);
+        }
+    }// end of rundijkstraAlgorithm method
+
     public static void initializeMinimumSpanningTree_Matrix(){
         Matrix = new double[N+countIntersection][N+countIntersection];
         boolean isExist;
@@ -93,7 +164,8 @@ public class phase1_3 extends phase1_2 {
             }
         }
     }// end of initializeMinimumSpanningTree_Matrix
-    public static void matrixOutput(){
+
+/*    public static void matrixOutput(){
         for(int i=0;i<N+countIntersection;i++){
             for(int j=0;j<N+countIntersection;j++){
                 System.out.print(String.format("%.6f", Matrix[i][j])+"  ");
@@ -101,10 +173,10 @@ public class phase1_3 extends phase1_2 {
             System.out.println("");
         }
 
-        /*for(int i=0;i<((M*M)-M)/2;i++){
+        for(int i=0;i<((M*M)-M)/2;i++){
             System.out.println(point1Intersection[i]+"  "+point2Intersection[i]+"  "+point3Intersection[i]+"  "+point4Intersection[i]+"  ");
-        }*/
-    }
+        }
+    } */
 
     public static void searchIntersection02(){//override
         point = new Point[((M*M)-M)/2];
