@@ -68,6 +68,9 @@ public class phase1_1 {
         y = new int[N+P];
         b_p = new int[M];
         e_q = new int[M];
+        start = new String[Q];
+        end = new String[Q];
+        k = new int[Q];
         for(int i=0; i<N; i++){
             x[i] = scan.nextInt();
             y[i] = scan.nextInt();
