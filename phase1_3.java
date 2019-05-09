@@ -14,7 +14,7 @@ public class phase1_3 extends phase1_2 {
         input();
         searchIntersection02();
         initializeMinimumSpanningTree_Matrix();
-        //matrixOutput();
+        matrixOutput();
         rundijkstraAlgorithm();
     }
 
@@ -138,18 +138,21 @@ public class phase1_3 extends phase1_2 {
         }
 
         //calculate distance intersection to intersection
-        int coincidence;
+        int k;
+        int[] maybeSamePoint = new int[4];
         for(int i=0; i<countIntersection; i++){
             for(int j=i+1; j<countIntersection; j++){
-                coincidence = 0;
-                if(point1Intersection[elementIntersection[i]] == point1Intersection[elementIntersection[j]] || point1Intersection[elementIntersection[i]] == point2Intersection[elementIntersection[j]] || point1Intersection[elementIntersection[i]] == point3Intersection[elementIntersection[j]] || point1Intersection[elementIntersection[i]] == point4Intersection[elementIntersection[j]])coincidence++;
-                if(point2Intersection[elementIntersection[i]] == point1Intersection[elementIntersection[j]] || point2Intersection[elementIntersection[i]] == point2Intersection[elementIntersection[j]] || point2Intersection[elementIntersection[i]] == point3Intersection[elementIntersection[j]] || point2Intersection[elementIntersection[i]] == point4Intersection[elementIntersection[j]])coincidence++;
-                if(point3Intersection[elementIntersection[i]] == point1Intersection[elementIntersection[j]] || point3Intersection[elementIntersection[i]] == point2Intersection[elementIntersection[j]] || point3Intersection[elementIntersection[i]] == point3Intersection[elementIntersection[j]] || point3Intersection[elementIntersection[i]] == point4Intersection[elementIntersection[j]])coincidence++;
-                if(point4Intersection[elementIntersection[i]] == point1Intersection[elementIntersection[j]] || point4Intersection[elementIntersection[i]] == point2Intersection[elementIntersection[j]] || point4Intersection[elementIntersection[i]] == point3Intersection[elementIntersection[j]] || point4Intersection[elementIntersection[i]] == point4Intersection[elementIntersection[j]])coincidence++;
-                //System.out.println(coincidence);
-                if(coincidence >= 3){
-                    Matrix[i+N][j+N] = calculateDistance(point[elementIntersection[i]].x, point[elementIntersection[i]].y, point[elementIntersection[j]].x, point[elementIntersection[j]].y);
-                    Matrix[j+N][i+N] = Matrix[i+N][j+N];
+                k=0;
+                if(point1Intersection[elementIntersection[i]] == point1Intersection[elementIntersection[j]] || point1Intersection[elementIntersection[i]] == point2Intersection[elementIntersection[j]] || point1Intersection[elementIntersection[i]] == point3Intersection[elementIntersection[j]] || point1Intersection[elementIntersection[i]] == point4Intersection[elementIntersection[j]])maybeSamePoint[k++]=point1Intersection[elementIntersection[i]];
+                if(point2Intersection[elementIntersection[i]] == point1Intersection[elementIntersection[j]] || point2Intersection[elementIntersection[i]] == point2Intersection[elementIntersection[j]] || point2Intersection[elementIntersection[i]] == point3Intersection[elementIntersection[j]] || point2Intersection[elementIntersection[i]] == point4Intersection[elementIntersection[j]])maybeSamePoint[k++]=point2Intersection[elementIntersection[i]];
+                if(point3Intersection[elementIntersection[i]] == point1Intersection[elementIntersection[j]] || point3Intersection[elementIntersection[i]] == point2Intersection[elementIntersection[j]] || point3Intersection[elementIntersection[i]] == point3Intersection[elementIntersection[j]] || point3Intersection[elementIntersection[i]] == point4Intersection[elementIntersection[j]])maybeSamePoint[k++]=point3Intersection[elementIntersection[i]];
+                if(point4Intersection[elementIntersection[i]] == point1Intersection[elementIntersection[j]] || point4Intersection[elementIntersection[i]] == point2Intersection[elementIntersection[j]] || point4Intersection[elementIntersection[i]] == point3Intersection[elementIntersection[j]] || point4Intersection[elementIntersection[i]] == point4Intersection[elementIntersection[j]])maybeSamePoint[k++]=point4Intersection[elementIntersection[i]];
+
+                if(k >= 2){
+                    if(checkSameLine(maybeSamePoint, k) == true){
+                        Matrix[i+N][j+N] = calculateDistance(point[elementIntersection[i]].x, point[elementIntersection[i]].y, point[elementIntersection[j]].x, point[elementIntersection[j]].y);
+                        Matrix[j+N][i+N] = Matrix[i+N][j+N];    
+                    }
                 }
             }
         }
@@ -164,8 +167,21 @@ public class phase1_3 extends phase1_2 {
             }
         }
     }// end of initializeMinimumSpanningTree_Matrix
+    public static boolean checkSameLine(int[] maybeSamePoint, int k){
+        boolean isLine = false;
+        for(int i=0; i<k; i++){
+            for(int j=0; j<M; j++){
+                if(b_p[j] == maybeSamePoint[i]){
+                    for(int ii=0; ii<k; ii++){
+                        if(e_q[j] == maybeSamePoint[ii])isLine = true;
+                    }
+                }
+            }
+        }
+        return isLine;
+    }
 
-/*    public static void matrixOutput(){
+    public static void matrixOutput(){
         for(int i=0;i<N+countIntersection;i++){
             for(int j=0;j<N+countIntersection;j++){
                 System.out.print(String.format("%.6f", Matrix[i][j])+"  ");
@@ -176,7 +192,7 @@ public class phase1_3 extends phase1_2 {
         for(int i=0;i<((M*M)-M)/2;i++){
             System.out.println(point1Intersection[i]+"  "+point2Intersection[i]+"  "+point3Intersection[i]+"  "+point4Intersection[i]+"  ");
         }
-    } */
+    }
 
     public static void searchIntersection02(){//override
         point = new Point[((M*M)-M)/2];
