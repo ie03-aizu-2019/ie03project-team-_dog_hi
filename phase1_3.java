@@ -10,11 +10,12 @@ public class phase1_3 extends phase1_2 {
     protected static int WHITE = 0;
     protected static int GRAY = 1;
     protected static int BLACK = 2;
+    protected static Point[] originalPoints;
     public static void main(String[] argv){
         input();
         searchIntersection02();
         initializeMinimumSpanningTree_Matrix();
-        matrixOutput();
+        //matrixOutput();
         rundijkstraAlgorithm();
     }
 
@@ -88,6 +89,7 @@ public class phase1_3 extends phase1_2 {
 
     public static void initializeMinimumSpanningTree_Matrix(){
         Matrix = new double[N+countIntersection][N+countIntersection];
+        originalPoints = new Point[N+countIntersection];
         boolean isExist;
         int nowElement=-1;
         elementIntersection = new int[countIntersection];
@@ -152,6 +154,51 @@ public class phase1_3 extends phase1_2 {
                     if(checkSameLine(maybeSamePoint, k) == true){
                         Matrix[i+N][j+N] = calculateDistance(point[elementIntersection[i]].x, point[elementIntersection[i]].y, point[elementIntersection[j]].x, point[elementIntersection[j]].y);
                         Matrix[j+N][i+N] = Matrix[i+N][j+N];    
+                    }
+                }
+            }
+        }
+
+        // initialize all Point data
+        Point temp = new Point();
+        for(int i=0; i<N+P; i++){
+            originalPoints[i] = new Point();
+            originalPoints[i].x = (double)x[i];
+            originalPoints[i].y = (double)y[i];
+        }
+        int ele_poi = N;
+        for(int i=0; i<point.length; i++){
+            if(point[i].x!=0 && point[i].y!=0){
+                originalPoints[ele_poi] = new Point();
+                originalPoints[ele_poi] = point[i];
+                ele_poi++;
+            }
+        }
+
+        // if tilt of Point data is same others
+        /*for(int i=0; i<N+countIntersection; i++){
+            System.out.println(originalPoints[i].x+" "+originalPoints[i].y);
+        }*/
+        double tilt1, tilt2, tilt3;
+        for(int i=0; i<M; i++){
+            tilt1 = (double)(y[b_p[i]] - y[e_q[i]]) / (x[b_p[i]] - x[e_q[i]]);
+            for(int j=0; j<N+countIntersection; j++){
+                if(b_p[i]!=j && e_q[i]!=j){
+                    tilt2 = (double)(originalPoints[j].y - y[b_p[i]]) / (originalPoints[j].x - x[b_p[i]]);
+
+                    if(-EPS<=tilt1-tilt2 && tilt1-tilt2<=EPS && x[b_p[i]]<originalPoints[j].x && originalPoints[j].x<x[e_q[i]]){
+                        Matrix[j][b_p[i]] = calculateDistance(originalPoints[j].x, originalPoints[j].y, x[b_p[i]], y[b_p[i]]);
+                        Matrix[b_p[i]][j] = Matrix[j][b_p[i]];
+                        Matrix[j][e_q[i]] = calculateDistance(originalPoints[j].x, originalPoints[j].y, x[e_q[i]], y[e_q[i]]);
+                        Matrix[e_q[i]][j] = Matrix[j][e_q[i]];   
+                        
+                        for(int m=N; m<N+countIntersection; m++){
+                            tilt3 = (double)(originalPoints[m].y - y[b_p[i]]) / (originalPoints[m].x - x[b_p[i]]);
+                            if(-EPS<=tilt1-tilt3 && tilt1-tilt3<=EPS && x[b_p[i]]<originalPoints[m].x && originalPoints[m].x<x[e_q[i]]){
+                                Matrix[m][j] = calculateDistance(originalPoints[m].x, originalPoints[m].y, originalPoints[j].x, originalPoints[j].y);
+                                Matrix[j][m] = Matrix[m][j];
+                            }
+                        }
                     }
                 }
             }
@@ -222,4 +269,50 @@ public class phase1_3 extends phase1_2 {
         distance = Math.sqrt(distance);
         return distance;
     }
+
+    public static Point search_intersection(int i, int j){
+        double matrix_a;    // matrix_a is |A|
+        boolean exist_intersection = false;
+        Point point1 = new Point();
+        matrix_a = (double)(x[e_q[i]] - x[b_p[i]]) * (y[b_p[j]] - y[e_q[j]]) + (x[e_q[j]] - x[b_p[j]]) * (y[e_q[i]] - y[b_p[i]]);
+        //step1
+        if(matrix_a <= EPS  && -EPS <= matrix_a){
+            exist_intersection = false;
+        } else {
+            exist_intersection = true;
+            //step2 (calculate s and t)
+            s = ((double)(y[b_p[j]] - y[e_q[j]]) * (x[b_p[j]] - x[b_p[i]]) + (x[e_q[j]] - x[b_p[j]]) * (y[b_p[j]] - y[b_p[i]])) / matrix_a;
+            t = ((double)(y[b_p[i]] - y[e_q[i]]) * (x[b_p[j]] - x[b_p[j]]) + (x[e_q[i]] - x[b_p[i]]) * (y[b_p[j]] - y[b_p[i]])) / matrix_a;
+        }
+        if(exist_intersection == true){
+            //step3
+            if(0<=s && s<=1  && 0<=t && t<=1){
+                exist_intersection = true;
+                //step4
+                x_intersection = (double)x[b_p[i]] + (double)(x[e_q[i]] - x[b_p[i]]) * s;   //x = x_P1 + (x_Q1 - x_P1)*s
+                y_intersection = (double)y[b_p[i]] + (double)(y[e_q[i]] - y[b_p[i]]) * s;
+                //System.out.println(x_intersection+" "+y_intersection);
+            } else {
+                exist_intersection = false;
+            }
+        }
+
+        //search for contact point
+        for(int k=0; k<N ;k++){
+            if(x[k]==x_intersection && y[k]==y_intersection){
+                exist_intersection = false;
+                //System.out.println("交点と元の座標が被りました。"+x_intersection+" "+y_intersection);
+            }
+        }
+        
+        if(exist_intersection == true){
+            point1.x = x_intersection;
+            point1.y = y_intersection;
+        } else {
+            point1.x = 0;
+            point1.y = 0;
+        }
+        return point1;
+    }
+
 }
