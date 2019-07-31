@@ -5,7 +5,6 @@ public class phase3_9 extends phase2_8{
     public static void main(String[] args){
         input();
 
-        System.out.println("小課題"+problemNum+"のデータを入力してください。");
         switch (problemNum){
             case 1:
                 phase1_1 p11 = new phase1_1();
@@ -81,6 +80,7 @@ public class phase3_9 extends phase2_8{
         Scanner scan = new Scanner(System.in);
         System.out.println("何番目の小課題を実行しますか？");
         problemNum = scan.nextInt();
+        System.out.println("小課題"+problemNum+"のデータを入力してください。");
 
         N = scan.nextInt();
         M = scan.nextInt();
